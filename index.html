@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Page of IF-MDM</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin-top: 100px;
+        }
+        table {
+            text-align: center;
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        img {
+            width: 100%;
+            height: auto;
+        }
+        video {
+            width: 100%;
+            height: auto;
+        }
+        h1, h2, h3 {
+            margin-top: 20px;
+        }
+    </style>
+    <script>
+        // Function to play all videos in a row
+        function playAll(rowId) {
+            const videos = document.querySelectorAll(`.video-group-${rowId}`);
+            videos.forEach(video => video.play());
+        }
+
+        // Function to pause all videos in a row
+        function pauseAll(rowId) {
+            const videos = document.querySelectorAll(`.video-group-${rowId}`);
+            videos.forEach(video => video.pause());
+        }
+
+        // Function to reset all videos in a row to beginning
+        function resetAll(rowId) {
+            const videos = document.querySelectorAll(`.video-group-${rowId}`);
+            videos.forEach(video => {
+                video.pause();
+                video.currentTime = 0;
+            });
+        }
+
+        // Function to fit the table to the screen
+        function fitToScreen() {
+            const intthewild_cells = Array.from(document.getElementById('inthewild-table').querySelectorAll('tr')).map(row => 
+                Array.from(row.querySelectorAll('td')).slice(0, 4)
+            ).flat();
+            const intthewild_maxWidth = window.innerWidth * (1 - 0.1) / 4;
+            intthewild_cells.forEach(cell => {
+                cell.style.width = `${intthewild_maxWidth}px`;
+            });
+
+            const hdtf_cells = Array.from(document.getElementById('hdtf-table').querySelectorAll('tr')).map(row => 
+                Array.from(row.querySelectorAll('td')).slice(1, 5)
+            ).flat();
+            const hdtf_maxWidth = window.innerWidth * (1 - 0.1) / 4;
+            hdtf_cells.forEach(cell => {
+                cell.style.width = `${hdtf_maxWidth}px`;
+            });
+
+            const motion_degree_cells = Array.from(document.getElementById('motion-degree-table').querySelectorAll('tr')).map(row => 
+                Array.from(row.querySelectorAll('td')).slice(1, 6)
+            ).flat();
+            const motion_degree_maxWidth = window.innerWidth * (1 - 0.1) / 5;
+            motion_degree_cells.forEach(cell => {
+                cell.style.width = `${motion_degree_maxWidth}px`;
+            });
+        }
+
+        // Initialize Intersection Observer when document loads
+        document.addEventListener('DOMContentLoaded', () => {
+            // Create observer options
+            const options = {
+                root: null, // Use viewport as root
+                rootMargin: '50px', // Start loading when video is 50px from viewport
+                threshold: 0.1 // Trigger when at least 10% of video is visible
+            };
+
+            // Create observer
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    // Get all source elements within the video
+                    const sources = entry.target.getElementsByTagName('source');
+                    
+                    if (entry.isIntersecting) {
+                        // When video enters viewport
+                        Array.from(sources).forEach(source => {
+                            // Get data-src and set as src
+                            const url = source.getAttribute('data-src');
+                            if (url) {
+                                source.setAttribute('src', url);
+                            }
+                        });
+                        
+                        // Load the video
+                        entry.target.load();
+                        
+                        // Stop observing this video
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, options);
+
+            // Start observing all videos
+            document.querySelectorAll('video').forEach(video => {
+                // Move src to data-src
+                const sources = video.getElementsByTagName('source');
+                Array.from(sources).forEach(source => {
+                    const url = source.getAttribute('src');
+                    source.setAttribute('data-src', url);
+                    source.removeAttribute('src');
+                });
+                
+                observer.observe(video);
+            });
+
+            fitToScreen();
+        });
+    </script>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">IF-MDM</a>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link" href="#table-of-contents">Table of Contents</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#inthewild-title">Section 1</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#hdtf-title">Section 2</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#motion-degree-title">Section 3</a></li>
+                </ul>
+            </div>
+            <button class="navbar-button" onclick="fitToScreen()">
+                Fit videos to screen
+            </button>
+        </div>
+    </nav>
+    <div class="container text-center">
+        <h2>IF-MDM</h2>
+        <h3>Implicit Face Motion Diffusion Model for Compressing Dynamic Motion Latent</h3>
+    </div>
+    <div class="container">
+        <h3 id="table-of-contents">Table of Contents</h3>
+        <ul>
+            <li><a href="#inthewild-title">Section 1: Results of In-the-Wild Input Image</a></li>
+            <li><a href="#hdtf-title">Section 2: Results of HDTF</a></li>
+            <li><a href="#motion-degree-title">Section 3: Motion Degree Ablation Study</a></li>
+        </ul>
+    </div>
+    <div class="container">
+        <h3 id="inthewild-title">Section 1: Results of In-the-Wild Input Image</h3>
+        <table id="inthewild-table">
+            <tbody>
+                <tr>
+                    <td>
+                        <video controls>
+                            <source src="./assets/section_inthewild/results_03_lincoln.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                    <td>
+                        <video controls>
+                            <source src="./assets/section_inthewild/results_02_unsplash.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                    <td>
+                        <video controls>
+                            <source src="./assets/section_inthewild/results_10_google.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                    <td>
+                        <video controls>
+                            <source src="./assets/section_inthewild/results_04_unsplash.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <video controls>
+                            <source src="./assets/section_inthewild/results_05_vasa1.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                    <td>
+                        <video controls>
+                            <source src="./assets/section_inthewild/results_06_vasa1.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                    <td>
+                        <video controls>
+                            <source src="./assets/section_inthewild/results_07_emo.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                    <td>
+                        <video controls>
+                            <source src="./assets/section_inthewild/results_08_emo.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <video controls>
+                            <source src="./assets/section_inthewild/results_09_google.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                    <td>
+                        <video controls>
+                            <source src="./assets/section_inthewild/results_01_mlk.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                    <td>
+                        <video controls>
+                            <source src="./assets/section_inthewild/results_11_glinda.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                    <td>
+                        <video controls>
+                            <source src="./assets/section_inthewild/results_12_obama.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="container">
+        <h3 id="hdtf-title">Section 2: Results of HDTF</h3>
+        <p>
+            Each model gets the input image and speech audio as input and generates the video.
+            <br>
+            Check the 'Table 1', 'Figure 5' and '4.3 Talking head generation part' in the main paper.
+        </p>
+        <ul>
+            <li>Press the play button to play all videos in a row.</li>
+            <li>Press the pause button to pause all videos in a row.</li>
+            <li>Press the reset button to reset all videos in a row to beginning.</li>
+        </ul>
+        <table id="hdtf-table">
+            <thead>
+                <tr>
+                    <th>Control Buttons</th>
+                    <th>Input Image</th>
+                    <th>Aniportrait</th>
+                    <th>Real 3D Portrait</th>
+                    <th>IDMFM (Ours)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="text-align: left;">
+                    <td></td>
+                    <td></td>
+                    <td>
+                        <ul>
+                            <li>The method based on the video diffusion model</li>
+                            <li>Slow (0.8 FPS)</li>
+                            <li>It has natural head movement.</li>
+                            <li>It has heat haze problem. (Bad temporal consistency)</li>
+                        </ul>
+                    </td>
+                    <td>
+                        <ul>
+                            <li>The method based on the explicit face model</li>
+                            <li>It has good lipsync quality</li>
+                            <li>It has floating head problem. (Bad alignment between head and body)</li>
+                        </ul>
+                    </td>
+                    <td>
+                        <ul>
+                            <li>Our method utilizes the implicit face model diffusion model</li>
+                            <li>Fast (30 FPS)</li>
+                            <li>It has natural head movement.</li>
+                            <li>It has good visual quality.</li>
+                        </ul>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <button onclick="playAll(3)">Play All</button>
+                        <button onclick="pauseAll(3)">Pause All</button>
+                        <button onclick="resetAll(3)">Reset All</button>
+                    </td>
+                    <td>
+                        <img src="assets/section_hdtf/31_identity_image.jpg" alt="Identity Image 31">
+                    </td>
+                    <td>
+                        <video class="video-group-3" controls preload="none" muted>
+                            <source src="assets/section_hdtf/31_aniportrait.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                    <td>
+                        <video class="video-group-3" controls preload="none" muted>
+                            <source src="assets/section_hdtf/31_real3dportrait.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                    <td>
+                        <video class="video-group-3" controls preload="none">
+                            <source src="assets/section_hdtf/31_idmfm.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <button onclick="playAll(2)">Play All</button>
+                        <button onclick="pauseAll(2)">Pause All</button>
+                        <button onclick="resetAll(2)">Reset All</button>
+                    </td>
+                    <td>
+                        <img src="assets/section_hdtf/29_identity_image.jpg" alt="Identity Image 29">
+                    </td>
+                    <td>
+                        <video class="video-group-2" controls preload="none" muted>
+                            <source src="assets/section_hdtf/29_aniportrait.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                    <td>
+                        <video class="video-group-2" controls preload="none" muted>
+                            <source src="assets/section_hdtf/29_real3dportrait.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                    <td>
+                        <video class="video-group-2" controls preload="none">
+                            <source src="assets/section_hdtf/29_idmfm.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <button onclick="playAll(1)">Play All</button>
+                        <button onclick="pauseAll(1)">Pause All</button>
+                        <button onclick="resetAll(1)">Reset All</button>
+                    </td>
+                    <td>
+                        <img src="assets/section_hdtf/11_identity_image.jpg" alt="Identity Image 11">
+                    </td>
+                    <td>
+                        <video class="video-group-1" controls preload="none" muted>
+                            <source src="assets/section_hdtf/11_aniportrait.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                    <td>
+                        <video class="video-group-1" controls preload="none" muted>
+                            <source src="assets/section_hdtf/11_real3dportrait.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                    <td>
+                        <video class="video-group-1" controls preload="none">
+                            <source src="assets/section_hdtf/11_idmfm.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <button onclick="playAll(4)">Play All</button>
+                        <button onclick="pauseAll(4)">Pause All</button>
+                        <button onclick="resetAll(4)">Reset All</button>
+                    </td>
+                    <td>
+                        <img src="assets/section_hdtf/28_identity_image.jpg" alt="Identity Image 28">
+                    </td>
+                    <td>
+                        <video class="video-group-4" controls preload="none" muted>
+                            <source src="assets/section_hdtf/28_aniportrait.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                    <td>
+                        <video class="video-group-4" controls preload="none" muted>
+                            <source src="assets/section_hdtf/28_real3dportrait.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                    <td>
+                        <video class="video-group-4" controls preload="none">
+                            <source src="assets/section_hdtf/28_idmfm.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <button onclick="playAll(5)">Play All</button>
+                        <button onclick="pauseAll(5)">Pause All</button>
+                        <button onclick="resetAll(5)">Reset All</button>
+                    </td>
+                    <td>
+                        <img src="assets/section_hdtf/15_identity_image.jpg" alt="Identity Image 15">
+                    </td>
+                    <td>
+                        <video class="video-group-5" controls preload="none" muted>
+                            <source src="assets/section_hdtf/15_aniportrait.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                    <td>
+                        <video class="video-group-5" controls preload="none" muted>
+                            <source src="assets/section_hdtf/15_real3dportrait.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                    <td>
+                        <video class="video-group-5" controls preload="none">
+                            <source src="assets/section_hdtf/15_idmfm.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <button onclick="playAll(6)">Play All</button>
+                        <button onclick="pauseAll(6)">Pause All</button>
+                        <button onclick="resetAll(6)">Reset All</button>
+                    </td>
+                    <td>
+                        <img src="assets/section_hdtf/25_identity_image.jpg" alt="Identity Image 25">
+                    </td>
+                    <td>
+                        <video class="video-group-6" controls preload="none" muted>
+                            <source src="assets/section_hdtf/25_aniportrait.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                    <td>
+                        <video class="video-group-6" controls preload="none" muted>
+                            <source src="assets/section_hdtf/25_real3dportrait.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                    <td>
+                        <video class="video-group-6" controls preload="none">
+                            <source src="assets/section_hdtf/25_idmfm.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+    </div>  <!-- End of HDTF Container -->
+    <div class="container">
+        <h3 id="motion-degree-title">Section 3: Motion Degree Ablation Study</h3>
+        <p>
+            The motion degree is controlled by the mean and standard deviation of the motion embedding.
+            <br>
+            Check the 'Figure 7', 'Table 3','3.4 Motion degree control', and '4.5 Control the motion dynamics' in the main paper.
+        </p>
+        <ul>
+            <li>Press the play button to play all videos in a row.</li>
+            <li>Press the pause button to pause all videos in a row.</li>
+            <li>Press the reset button to reset all videos in a row to beginning.</li>
+        </ul>
+        <table id="motion-degree-table">
+            <thead>
+                <tr>
+                    <th>Control Buttons</th>
+                    <th>No Control Signal</th>
+                    <th>Mean as Input</th>
+                    <th>Mean as Last Frame</th>
+                    <th>Std as 0.1</th>
+                    <th>Std as 0.3</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="text-align: left;">
+                    <td></td>
+                    <td>
+                        <ul>
+                            <li>We can drop-out the motion mean and standard deviation not to control the motion degree.</li>
+                            <li>In 'Table 1', 'Figure 5' of the main paper and 'Section 2' of the supplementary material, this setup is used.</li>
+                        </ul>
+                    </td>
+                    <td>
+                        <ul>
+                            <li>Give the motion mean as the extracted motion from input image.</li>
+                            <li>This will keep the posture of the input image.</li>
+                            <li>Good for in-the-wild input image with various postures.</li>
+                        </ul>
+                    </td>
+                    <td>
+                        <ul>
+                            <li>Give the motion mean as the last frame of the previous generated chunk.</li>
+                            <li>This will diversify the generated motion.</li>
+                        </ul>
+                    </td>
+                    <td>
+                        <ul>
+                            <li>Set the motion standard deviation as 0.1.</li>
+                            <li>This will have less motion dynamics.</li>
+                        </ul>
+                    </td>
+                    <td>
+                        <ul>
+                            <li>Set the motion standard deviation as 0.3.</li>
+                            <li>This will have more motion dynamics.</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <button onclick="playAll(7)">Play All</button>
+                        <button onclick="pauseAll(7)">Pause All</button>
+                        <button onclick="resetAll(7)">Reset All</button>
+                    </td>
+                    <td>
+                        <video class="video-group-7" controls preload="none">
+                            <source src="assets/section_motion_degree/results_01_00.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                    <td>
+                        <video class="video-group-7" controls preload="none" muted>
+                            <source src="assets/section_motion_degree/results_01_01.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                    <td>
+                        <video class="video-group-7" controls preload="none" muted>
+                            <source src="assets/section_motion_degree/results_01_02.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                    <td>
+                        <video class="video-group-7" controls preload="none" muted>
+                            <source src="assets/section_motion_degree/results_01_03.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                    <td>
+                        <video class="video-group-7" controls preload="none" muted>
+                            <source src="assets/section_motion_degree/results_01_04.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <button onclick="playAll(8)">Play All</button>
+                        <button onclick="pauseAll(8)">Pause All</button>
+                        <button onclick="resetAll(8)">Reset All</button>
+                    </td>
+                    <td>
+                        <video class="video-group-8" controls preload="none">
+                            <source src="assets/section_motion_degree/results_03_00.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                    <td>
+                        <video class="video-group-8" controls preload="none" muted>
+                            <source src="assets/section_motion_degree/results_03_01.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                    <td>
+                        <video class="video-group-8" controls preload="none" muted>
+                            <source src="assets/section_motion_degree/results_03_02.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                    <td>
+                        <video class="video-group-8" controls preload="none" muted>
+                            <source src="assets/section_motion_degree/results_03_03.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                    <td>
+                        <video class="video-group-8" controls preload="none" muted>
+                            <source src="assets/section_motion_degree/results_03_04.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <button onclick="playAll(9)">Play All</button>
+                        <button onclick="pauseAll(9)">Pause All</button>
+                        <button onclick="resetAll(9)">Reset All</button>
+                    </td>
+                    <td>
+                        <video class="video-group-9" controls preload="none">
+                            <source src="assets/section_motion_degree/results_05_00.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                    <td>
+                        <video class="video-group-9" controls preload="none" muted>
+                            <source src="assets/section_motion_degree/results_05_01.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                    <td>
+                        <video class="video-group-9" controls preload="none" muted>
+                            <source src="assets/section_motion_degree/results_05_02.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                    <td>
+                        <video class="video-group-9" controls preload="none" muted>
+                            <source src="assets/section_motion_degree/results_05_03.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                    <td>
+                        <video class="video-group-9" controls preload="none" muted>
+                            <source src="assets/section_motion_degree/results_05_04.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <button onclick="playAll(10)">Play All</button>
+                        <button onclick="pauseAll(10)">Pause All</button>
+                        <button onclick="resetAll(10)">Reset All</button>
+                    </td>
+                    <td>
+                        <video class="video-group-10" controls preload="none">
+                            <source src="assets/section_motion_degree/results_06_00.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                    <td>
+                        <video class="video-group-10" controls preload="none" muted>
+                            <source src="assets/section_motion_degree/results_06_01.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                    <td>
+                        <video class="video-group-10" controls preload="none" muted>
+                            <source src="assets/section_motion_degree/results_06_02.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                    <td>
+                        <video class="video-group-10" controls preload="none" muted>
+                            <source src="assets/section_motion_degree/results_06_03.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                    <td>
+                        <video class="video-group-10" controls preload="none" muted>
+                            <source src="assets/section_motion_degree/results_06_04.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <button onclick="playAll(11)">Play All</button>
+                        <button onclick="pauseAll(11)">Pause All</button>
+                        <button onclick="resetAll(11)">Reset All</button>
+                    </td>
+                    <td>
+                        <video class="video-group-11" controls preload="none">
+                            <source src="assets/section_motion_degree/results_00_00.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                    <td>
+                        <video class="video-group-11" controls preload="none" muted>
+                            <source src="assets/section_motion_degree/results_00_01.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                    <td>
+                        <video class="video-group-11" controls preload="none" muted>
+                            <source src="assets/section_motion_degree/results_00_02.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                    <td>
+                        <video class="video-group-11" controls preload="none" muted>
+                            <source src="assets/section_motion_degree/results_00_03.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                    <td>
+                        <video class="video-group-11" controls preload="none" muted>
+                            <source src="assets/section_motion_degree/results_00_04.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <button onclick="playAll(12)">Play All</button>
+                        <button onclick="pauseAll(12)">Pause All</button>
+                        <button onclick="resetAll(12)">Reset All</button>
+                    </td>
+                    <td>
+                        <video class="video-group-12" controls preload="none">
+                            <source src="assets/section_motion_degree/results_02_00.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                    <td>
+                        <video class="video-group-12" controls preload="none" muted>
+                            <source src="assets/section_motion_degree/results_02_01.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                    <td>
+                        <video class="video-group-12" controls preload="none" muted>
+                            <source src="assets/section_motion_degree/results_02_02.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                    <td>
+                        <video class="video-group-12" controls preload="none" muted>
+                            <source src="assets/section_motion_degree/results_02_03.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                    <td>
+                        <video class="video-group-12" controls preload="none" muted>
+                            <source src="assets/section_motion_degree/results_02_04.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>  <!-- End of Motion Degree Container -->
+    <!-- Include Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
